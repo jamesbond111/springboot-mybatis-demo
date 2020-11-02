@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    username: root
+    password: lb@21551067
+    url: jdbc:mysql://localhost:3306/nova?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  mapper-locations: classpath:mapper/*Mapper.xml
+  type-aliases-package: com.bili.finance.financemg.model.entity
+  #  日志中展示sql
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+logging:
+  file:
+    name: finance_mg.log
+    clean-history-on-start: true
+    max-history: 30
+    max-size: 10MB
+  # 控制日志输出级别
+  level:
+    root: info

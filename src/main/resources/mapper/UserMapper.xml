@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bili.finance.financemg.mapper.UserMapper">
+    <!--如果sql查询出来的字段，跟bean中的属性无法对应上，则需要借助ResultMap进行映射-->
+    <resultMap id="UserMap" type="com.bili.finance.financemg.model.entity.User">
+        <id property="id" column="t_id" jdbcType="BIGINT"/>
+        <result property="name" column="ttt_name" jdbcType="VARCHAR"/>
+        <result property="age" column="ttt_age" jdbcType="BIGINT"/>
+    </resultMap>
+    <sql id="Base_Column">
+    t_id, ttt_name
+    </sql>
+
+    <select id="findAll" resultMap="UserMap">
+        SELECT * FROM tb_user
+    </select>
+
+    <select id="getUserById" resultMap="UserMap">
+        SELECT * FROM tb_user where t_id = #{userId}
+    </select>
+
+    <!--    使用foreach将List中的元素进行处理，组装成（？，？）的格式-->
+    <select id="getUserByIds" resultMap="UserMap">
+        SELECT * FROM tb_user where t_id in
+        <foreach collection="userIds" index="index" item="item" open="(" separator="," close=")">
+        #{item,jdbcType=BIGINT}
+        </foreach>
+    </select>
+
+    <!--    使用的是#而非$-->
+    <select id="getUserByIdAndName" resultMap="UserMap">
+        SELECT
+        <include refid="Base_Column"/>
+        FROM tb_user where t_id = #{userId,jdbcType=BIGINT} and ttt_name like
+        concat('%',#{userName,jdbcType=VARCHAR},'%')
+    </select>
+
+    <insert id="addUser">
+        insert into tb_user(ttt_name, ttt_age)
+        values (#{userName,jdbcType=VARCHAR},#{age,jdbcType=BIGINT})
+    </insert>
+
+    <!--    keyProperty需要指定的是Bean中的属性，而非数据表的字段-->
+    <!--    values中需要设置的也是Bean中的属性，不能设置为其它没有的字段-->
+    <insert id="insertSelective" parameterType="com.bili.finance.financemg.model.entity.User" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into tb_user(ttt_name, ttt_age)
+        values (#{name,jdbcType=VARCHAR},#{age,jdbcType=BIGINT})
+    </insert>
+
+    <!--    更新操作的时候，需要使用<set>-->
+    <update id="updateSelective" parameterType="com.bili.finance.financemg.model.entity.User">
+        update tb_user
+        <set>
+            <if test="name != null">
+                ttt_name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="age != null">
+                ttt_age = #{age,jdbcType=BIGINT},
+            </if>
+        </set>
+        where
+        t_id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from tb_user
+        where
+        t_id = #{userId,jdbcType=BIGINT}
+    </delete>
+</mapper>
